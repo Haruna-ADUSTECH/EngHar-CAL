@@ -3,20 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EngHar_CAL - Advanced Online Calculator</title>
+    <title>EngHar_CAL - Advanced Calculator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <h1>EngHar_CAL</h1>
-        <form id="calcForm" onsubmit="return calculateExpression();">
+        <form id="calcForm">
+            <label for="calculationType">Select Calculation Type:</label>
+            <select id="calculationType" name="calculationType">
+                <option value="evaluate">Evaluate Expression</option>
+                <option value="differentiate">Differentiate</option>
+                <option value="integrate">Integrate</option>
+                <option value="limit">Calculate Limit</option>
+                <option value="solve">Solve Equation</option>
+            </select>
+
             <label for="expression">Enter Expression:</label>
-            <input type="text" id="expression" name="expression" placeholder="e.g., 2*x^2 + 3*x - 5">
+            <input type="text" id="expression" name="expression" placeholder="e.g., 2x^2 + 3x - 5">
+
+            <label for="variable">Variable (optional):</label>
+            <input type="text" id="variable" name="variable" placeholder="e.g., x">
+
+            <label for="value">Point of Evaluation (optional):</label>
+            <input type="text" id="value" name="value" placeholder="e.g., 2">
+
             <button type="submit">Calculate</button>
         </form>
-        <div id="result">
-            <!-- Result will be displayed here -->
-        </div>
+        <div id="result"></div>
     </div>
     <script src="script.js"></script>
 </body>
