@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngHar_CAL - Online Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>EngHar_CAL</h1>
+        <form action="calculate.jsp" method="post">
+            <label for="expression">Enter Expression:</label>
+            <input type="text" id="expression" name="expression" placeholder="e.g., 2x^2 + 3x - 5">
+            <button type="submit">Calculate</button>
+        </form>
+        <div id="result">
+            <%-- Result will be displayed here --%>
+        </div>
+    </div>
+</body>
+</html>
