@@ -1,88 +1,85 @@
-document.addEventListener("DOMContentLoaded", function() {
-    const calcForm = document.getElementById("calcForm");
-    const resultDisplay = document.getElementById("result");
+let display = document.getElementById('display');
+let currentInput = '';
 
-    calcForm.addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent the form from submitting the traditional way
+function appendNumber(number) {
+    currentInput += number;
+    display.value = currentInput;
+}
 
-        const calculationType = document.getElementById("calculationType").value;
-        const expression = document.getElementById("expression").value;
-        const variable = document.getElementById("variable").value || "x";
-        const value = document.getElementById("value").value || null;
+function appendOperator(op) {
+    // Allow operators and handle minus sign for negative numbers
+    if (currentInput === '' && op === '-') {
+        currentInput = '-';
+    } else if (currentInput !== '') {
+        currentInput += op;
+    }
+    display.value = currentInput;
+}
 
-        if (!expression) {
-            displayResult("Please enter an expression", true);
-            return;
-        }
+function appendDecimal() {
+    let lastNumber = currentInput.split(/[-+*/=]/).pop();
+    if (!lastNumber.includes('.')) {
+        currentInput += '.';
+        display.value = currentInput;
+    }
+}
 
-        try {
-            let result;
+function clearDisplay() {
+    currentInput = '';
+    display.value = '';
+}
 
-            switch (calculationType) {
-                case "evaluate":
-                    result = evaluateExpression(expression, variable, value);
-                    break;
-                case "differentiate":
-                    result = differentiateExpression(expression, variable, value);
-                    break;
-                case "integrate":
-                    result = integrateExpression(expression, variable, value);
-                    break;
-                case "limit":
-                    result = calculateLimit(expression, variable, value);
-                    break;
-                case "solve":
-                    result = solveEquation(expression, variable);
-                    break;
-                default:
-                    result = "Invalid calculation type selected";
-            }
+function calculate() {
+    try {
+        let equation = currentInput;
+        let solution = solveQuadratic(equation);
+        display.value = solution;
+        currentInput = solution;
+    } catch (error) {
+        display.value = 'Error';
+        currentInput = '';
+    }
+}
 
-            displayResult(result);
-        } catch (error) {
-            displayResult("Error in calculation: " + error.message, true);
-        }
-    });
-
-    function evaluateExpression(expr, variable, value) {
-        let formattedExpr = expr.replace(/\^/g, "**");
-        if (value !== null) {
-            formattedExpr = formattedExpr.replace(new RegExp(variable, "g"), value);
-        }
-        return new Function('return ' + formattedExpr)();
+function solveQuadratic(equation) {
+    // Ensure the equation contains 'x^2'
+    if (!equation.includes('x^2')) {
+        throw new Error('Not a quadratic equation');
     }
 
-    function differentiateExpression(expr, variable, point) {
-        // Use a library like math.js for symbolic differentiation
-        const result = math.derivative(expr, variable).toString();
-        if (point !== null) {
-            return `f'(${point}) = ` + math.evaluate(result.replace(new RegExp(variable, "g"), point));
-        }
-        return result;
-    }
+    // Extract coefficients a, b, and c
+    let coefficients = extractCoefficients(equation);
+    let a = coefficients.a;
+    let b = coefficients.b;
+    let c = coefficients.c;
 
-    function integrateExpression(expr, variable, point) {
-        // Use a library like math.js for symbolic integration
-        const result = math.integral(expr, variable).toString();
-        if (point !== null) {
-            return `∫(${expr}) d${variable} = ` + math.evaluate(result.replace(new RegExp(variable, "g"), point));
-        }
-        return result + " + C";
-    }
+    // Calculate the discriminant
+    let discriminant = b * b - 4 * a * c;
 
-    function calculateLimit(expr, variable, point) {
-        // Use a library like math.js for limits
-        return math.limit(expr, variable, point);
-    }
+    if (discriminant < 0) {
+        return 'No Real Solutions'; // If the discriminant is negative, no real solutions exist
+    } else {
+        let sqrtDiscriminant = Math.sqrt(discriminant);
+        let x1 = (-b + sqrtDiscriminant) / (2 * a);
+        let x2 = (-b - sqrtDiscriminant) / (2 * a);
 
-    function solveEquation(expr, variable) {
-        // Use a library like math.js to solve equations
-        const solutions = math.solve(expr, variable);
-        return solutions.length > 0 ? solutions.join(", ") : "No solution found";
+        return `x1 = ${x1}, x2 = ${x2}`;
     }
+}
 
-    function displayResult(result, isError = false) {
-        resultDisplay.textContent = `Result: ${result}`;
-        resultDisplay.style.color = isError ? "red" : "green";
-    }
-});
+function extractCoefficients(equation) {
+    // Normalize the equation by removing spaces and handling minus signs
+    equation = equation.replace(/\s+/g, '').replace(/-/g, '+-');
+
+    // Match the pattern for ax^2, bx, and c
+    let aMatch = equation.match(/([-+]?\d*)x\^2/);
+    let bMatch = equation.match(/([-+]?\d*)x(?!\^2)/);
+    let cMatch = equation.match(/([-+]?\d+)(?!x)/);
+
+    // Parse coefficients or default to 1 or 0
+    let a = aMatch ? parseFloat(aMatch[1] || '1') : 1;
+    let b = bMatch ? parseFloat(bMatch[1] || '1') : 0;
+    let c = cMatch ? parseFloat(cMatch[1]) : 0;
+
+    return { a, b, c };
+}
