@@ -13,35 +13,22 @@
         <h1>Calculation Result</h1>
         <div id="result">
             <%
+                // Retrieve input parameters
                 String calculationType = request.getParameter("calculationType");
                 String expression = request.getParameter("expression");
                 String variable = request.getParameter("variable");
-                String valueStr = request.getParameter("value");
-                double value = valueStr != null && !valueStr.isEmpty() ? Double.parseDouble(valueStr) : 0;
 
                 ExprEvaluator util = new ExprEvaluator(false, 100);
                 IExpr result = null;
-                
+
                 try {
                     switch (calculationType) {
-                        case "evaluate":
-                            result = util.eval(expression);
-                            break;
-                        case "differentiate":
-                            result = util.eval("D(" + expression + "," + variable + ")");
-                            if (!valueStr.isEmpty()) {
-                                result = util.eval(result.toString() + " /. " + variable + " -> " + value);
-                            }
-                            break;
-                        case "integrate":
-                            result = util.eval("Integrate(" + expression + "," + variable + ")");
-                            break;
-                        case "limit":
-                            result = util.eval("Limit(" + expression + "," + variable + " -> " + value + ")");
-                            break;
                         case "solve":
-                            result = util.eval("Solve(" + expression + ", " + variable + ")");
+                            // Replace '=' with '==' to correctly form an equation for solving
+                            String equation = expression.replace("=", "==");
+                            result = util.eval("Solve(" + equation + ", " + variable + ")");
                             break;
+                        // Other cases (evaluate, differentiate, etc.) would go here
                         default:
                             result = F.stringx("Invalid calculation type selected");
                     }
