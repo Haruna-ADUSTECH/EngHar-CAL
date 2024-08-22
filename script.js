@@ -7,7 +7,6 @@ function appendNumber(number) {
 }
 
 function appendOperator(op) {
-    // Allow operators and handle minus sign for negative numbers
     if (currentInput === '' && op === '-') {
         currentInput = '-';
     } else if (currentInput !== '') {
@@ -31,7 +30,7 @@ function clearDisplay() {
 
 function calculate() {
     try {
-        let equation = currentInput;
+        let equation = currentInput.replace('=', '');
         let solution = solveQuadratic(equation);
         display.value = solution;
         currentInput = solution;
@@ -48,16 +47,13 @@ function solveQuadratic(equation) {
     }
 
     // Extract coefficients a, b, and c
-    let coefficients = extractCoefficients(equation);
-    let a = coefficients.a;
-    let b = coefficients.b;
-    let c = coefficients.c;
+    let { a, b, c } = extractCoefficients(equation);
 
     // Calculate the discriminant
     let discriminant = b * b - 4 * a * c;
 
     if (discriminant < 0) {
-        return 'No Real Solutions'; // If the discriminant is negative, no real solutions exist
+        return 'No Real Solutions';
     } else {
         let sqrtDiscriminant = Math.sqrt(discriminant);
         let x1 = (-b + sqrtDiscriminant) / (2 * a);
@@ -68,17 +64,17 @@ function solveQuadratic(equation) {
 }
 
 function extractCoefficients(equation) {
-    // Normalize the equation by removing spaces and handling minus signs
-    equation = equation.replace(/\s+/g, '').replace(/-/g, '+-');
+    // Normalize the equation by removing spaces
+    equation = equation.replace(/\s+/g, '');
 
     // Match the pattern for ax^2, bx, and c
-    let aMatch = equation.match(/([-+]?\d*)x\^2/);
-    let bMatch = equation.match(/([-+]?\d*)x(?!\^2)/);
-    let cMatch = equation.match(/([-+]?\d+)(?!x)/);
+    let aMatch = equation.match(/([-+]?\d*\.?\d*)x\^2/);
+    let bMatch = equation.match(/([-+]?\d*\.?\d*)x(?!\^2)/);
+    let cMatch = equation.match(/([-+]?\d*\.?\d+)(?!x)/);
 
     // Parse coefficients or default to 1 or 0
     let a = aMatch ? parseFloat(aMatch[1] || '1') : 1;
-    let b = bMatch ? parseFloat(bMatch[1] || '1') : 0;
+    let b = bMatch ? parseFloat(bMatch[1] || (bMatch[0][0] === '-' ? '-1' : '1')) : 0;
     let c = cMatch ? parseFloat(cMatch[1]) : 0;
 
     return { a, b, c };
