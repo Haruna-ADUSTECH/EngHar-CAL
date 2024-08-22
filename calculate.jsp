@@ -22,31 +22,35 @@
                 ExprEvaluator util = new ExprEvaluator(false, 100);
                 IExpr result = null;
                 
-                switch (calculationType) {
-                    case "evaluate":
-                        result = util.eval(expression);
-                        break;
-                    case "differentiate":
-                        result = util.eval("D(" + expression + "," + variable + ")");
-                        if (!valueStr.isEmpty()) {
-                            result = util.eval(result.toString() + " /. " + variable + " -> " + value);
-                        }
-                        break;
-                    case "integrate":
-                        result = util.eval("Integrate(" + expression + "," + variable + ")");
-                        break;
-                    case "limit":
-                        result = util.eval("Limit(" + expression + "," + variable + " -> " + value + ")");
-                        break;
-                    case "solve":
-                        result = util.eval("Solve(" + expression + ", " + variable + ")");
-                        break;
-                    default:
-                        result = F.stringx("Invalid calculation type selected");
+                try {
+                    switch (calculationType) {
+                        case "evaluate":
+                            result = util.eval(expression);
+                            break;
+                        case "differentiate":
+                            result = util.eval("D(" + expression + "," + variable + ")");
+                            if (!valueStr.isEmpty()) {
+                                result = util.eval(result.toString() + " /. " + variable + " -> " + value);
+                            }
+                            break;
+                        case "integrate":
+                            result = util.eval("Integrate(" + expression + "," + variable + ")");
+                            break;
+                        case "limit":
+                            result = util.eval("Limit(" + expression + "," + variable + " -> " + value + ")");
+                            break;
+                        case "solve":
+                            result = util.eval("Solve(" + expression + ", " + variable + ")");
+                            break;
+                        default:
+                            result = F.stringx("Invalid calculation type selected");
+                    }
+                } catch (Exception e) {
+                    result = F.stringx("Error in calculation: " + e.getMessage());
                 }
             %>
             <p>Expression: <%= expression %></p>
-            <p>Result: <%= result.toString() %></p>
+            <p>Result: <%= result != null ? result.toString() : "No result" %></p>
         </div>
         <a href="index.html">Back to Calculator</a>
     </div>
